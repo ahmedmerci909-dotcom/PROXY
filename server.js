@@ -21,7 +21,7 @@ try {
 }
 
 // ============================================
-// ===== نقاط النهاية (مثل Astutech بالضبط) =====
+// ===== نقاط النهاية (مثل Astutech) =====
 // ============================================
 
 // 1. الصفحة الرئيسية (404 مثل Astutech)
@@ -82,7 +82,33 @@ app.get('/api/config', (req, res) => {
   });
 });
 
-// 6. جلب جميع الأغراض
+// 6. نقطة البنج (Ping)
+app.get('/api/ping', (req, res) => {
+  res.json({ status: 'success', pong: true });
+});
+
+// 7. نقطة المصادقة (Auth)
+app.post('/api/auth', (req, res) => {
+  res.json({
+    status: 'success',
+    token: 'fake_token_' + Date.now(),
+    user: {
+      id: 'guest_' + Date.now(),
+      name: 'STRAVEX_VIP'
+    }
+  });
+});
+
+// 8. نقطة إعادة تعيين الضيف
+app.post('/guest/reset', (req, res) => {
+  res.json({
+    status: 'success',
+    guestId: 'guest_' + Date.now(),
+    reset: true
+  });
+});
+
+// 9. جلب جميع الأغراض
 app.get('/api/items', (req, res) => {
   res.json({
     status: 'success',
@@ -91,7 +117,7 @@ app.get('/api/items', (req, res) => {
   });
 });
 
-// 7. جلب غرض محدد
+// 10. جلب غرض محدد
 app.get('/api/item/:id', (req, res) => {
   const item = itemsDB.find(i => i.id == req.params.id);
   if (item) {
@@ -101,8 +127,24 @@ app.get('/api/item/:id', (req, res) => {
   }
 });
 
+// ============================================
+// ===== نقطة عامة (Catch-All) للتشخيص =====
+// ============================================
+app.all('*', (req, res) => {
+  console.log(`📥 Request received: ${req.method} ${req.path}`);
+  res.json({
+    status: 'success',
+    message: 'Endpoint received (catch-all)',
+    method: req.method,
+    path: req.path,
+    body: req.body,
+    query: req.query
+  });
+});
+
 // ===== تشغيل السيرفر =====
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ STRAVEX PROXY (Astutech Clone) running on port ${PORT}`);
   console.log(`📦 Items loaded: ${itemsDB.length}`);
+  console.log(`🌐 Server URL: https://stravex-vip-proxy.onrender.com`);
 });
