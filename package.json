@@ -1,7 +1,7 @@
 {
   "name": "stravex-vip-proxy",
   "version": "2.0.0",
-  "description": "STRAVEX VIP PROXY - Full server with splash screen (Render ready)",
+  "description": "STRAVEX VIP PROXY - Astutech Clone with Full Logging",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
