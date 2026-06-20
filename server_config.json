@@ -1,0 +1,11 @@
+{
+  "server_url": "https://your-app-name.onrender.com/api",
+  "lobby_host": "your-app-name.onrender.com",
+  "lobby_port": 443,
+  "use_ssl": true,
+  "enable_mods": {
+    "unlock_all_items": true,
+    "infinite_diamonds": true,
+    "infinite_gold": true
+  }
+}
