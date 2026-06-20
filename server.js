@@ -51,7 +51,18 @@ app.get('/version', (req, res) => {
   });
 });
 
-// 3. نقطة تسجيل الدخول (srv0010)
+// 3. نقطة versionver.php (التي تطلبها اللعبة)
+app.get('/versionver.php', (req, res) => {
+  console.log('📦 versionver.php requested');
+  res.json({
+    latest: "OB53",
+    supported: ["OB53", "OB52", "OB51", "OB50", "OB49"],
+    forceUpdate: false,
+    updateUrl: "https://stravex-vip-proxy.onrender.com/update"
+  });
+});
+
+// 4. نقطة تسجيل الدخول (srv0010)
 app.post('/api/login', (req, res) => {
   console.log('🔐 Login requested');
   const userId = req.body.userId || 'guest_' + Date.now();
@@ -73,7 +84,7 @@ app.post('/api/login', (req, res) => {
   });
 });
 
-// 4. نقطة التحقق من صحة اللعبة
+// 5. نقطة التحقق من صحة اللعبة
 app.get('/api/validate', (req, res) => {
   console.log('✅ Validate requested');
   res.json({
@@ -83,7 +94,7 @@ app.get('/api/validate', (req, res) => {
   });
 });
 
-// 5. نقطة إعدادات اللعبة
+// 6. نقطة إعدادات اللعبة
 app.get('/api/config', (req, res) => {
   console.log('⚙️ Config requested');
   res.json({
@@ -97,13 +108,13 @@ app.get('/api/config', (req, res) => {
   });
 });
 
-// 6. نقطة البنج (Ping)
+// 7. نقطة البنج (Ping)
 app.get('/api/ping', (req, res) => {
   console.log('🏓 Ping requested');
   res.json({ status: 'success', pong: true });
 });
 
-// 7. نقطة المصادقة (Auth)
+// 8. نقطة المصادقة (Auth)
 app.post('/api/auth', (req, res) => {
   console.log('🔑 Auth requested');
   res.json({
@@ -116,7 +127,7 @@ app.post('/api/auth', (req, res) => {
   });
 });
 
-// 8. نقطة إعادة تعيين الضيف
+// 9. نقطة إعادة تعيين الضيف
 app.post('/guest/reset', (req, res) => {
   console.log('🔄 Guest reset requested');
   res.json({
@@ -126,7 +137,7 @@ app.post('/guest/reset', (req, res) => {
   });
 });
 
-// 9. جلب جميع الأغراض
+// 10. جلب جميع الأغراض
 app.get('/api/items', (req, res) => {
   console.log('📦 Items list requested');
   res.json({
@@ -136,7 +147,7 @@ app.get('/api/items', (req, res) => {
   });
 });
 
-// 10. جلب غرض محدد
+// 11. جلب غرض محدد
 app.get('/api/item/:id', (req, res) => {
   console.log(`🔍 Item ${req.params.id} requested`);
   const item = itemsDB.find(i => i.id == req.params.id);
@@ -229,6 +240,7 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`🌐 URL: https://stravex-vip-proxy.onrender.com`);
   console.log('\n📋 All endpoints:');
   console.log('  - GET /version');
+  console.log('  - GET /versionver.php');
   console.log('  - POST /api/login');
   console.log('  - GET /api/validate');
   console.log('  - GET /api/config');
