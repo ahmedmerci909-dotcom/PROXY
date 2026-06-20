@@ -31,10 +31,10 @@ try {
 }
 
 // ============================================
-// ===== نقاط النهاية (مثل Astutech + إضافية) =====
+// ===== نقاط النهاية الرئيسية =====
 // ============================================
 
-// 1. الصفحة الرئيسية (الآن ترد بـ 200)
+// 1. الصفحة الرئيسية
 app.get('/', (req, res) => {
   console.log('📄 Root path requested (200)');
   res.json({
@@ -62,7 +62,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// 2. نقطة الإصدارات (verAddr)
+// 2. نقطة الإصدارات
 app.get('/version', (req, res) => {
   console.log('📦 Version requested');
   res.json({
@@ -84,7 +84,7 @@ app.get('/versionver.php', (req, res) => {
   });
 });
 
-// 4. نقطة تسجيل الدخول (srv0010)
+// 4. نقطة تسجيل الدخول
 app.post('/api/login', (req, res) => {
   console.log('🔐 Login requested');
   const userId = req.body.userId || 'guest_' + Date.now();
@@ -106,17 +106,84 @@ app.post('/api/login', (req, res) => {
   });
 });
 
-// 5. نقطة التحقق من صحة اللعبة
-app.get('/api/validate', (req, res) => {
-  console.log('✅ Validate requested');
-  res.json({
-    status: "success",
-    valid: true,
-    message: "Game version is supported"
+// ============================================
+// ===== محاكاة السيرفرات الخارجية =====
+// ============================================
+
+// Unity
+app.get('/config.uca.cloud.unity3d.com', (req, res) => {
+  console.log('🎮 Unity config requested');
+  res.json({ 
+    status: 'success', 
+    config: { 
+      unityVersion: '2022.3.47f1',
+      analytics: true,
+      features: {
+        ads: true,
+        multiplayer: true
+      }
+    } 
   });
 });
 
-// 6. نقطة إعدادات اللعبة
+app.get('/cdp.cloud.unity3d.com', (req, res) => {
+  console.log('📊 Unity analytics requested');
+  res.json({ 
+    status: 'success', 
+    analytics: true,
+    tracking: false,
+    config: { 
+      environment: 'production',
+      version: '1.0.0'
+    }
+  });
+});
+
+// Facebook
+app.get('/graph.facebook.com', (req, res) => {
+  console.log('📘 Facebook requested');
+  res.json({ 
+    status: 'success', 
+    data: { 
+      id: 'fake_facebook_id_' + Date.now(),
+      name: 'Guest User'
+    }
+  });
+});
+
+// AppsFlyer (إعلانات)
+app.get('/rslw0r.inapps.appsflyersdk.com', (req, res) => {
+  console.log('📱 AppsFlyer requested');
+  res.json({ 
+    status: 'success',
+    ads: {
+      enabled: false,
+      url: 'https://example.com/ads'
+    }
+  });
+});
+
+// Firebase
+app.get('/firebaselogging-pa.googleapis.com', (req, res) => {
+  console.log('🔥 Firebase logging requested');
+  res.json({ 
+    status: 'success',
+    logging: {
+      enabled: true,
+      level: 'info'
+    }
+  });
+});
+
+// ============================================
+// ===== نقاط أخرى =====
+// ============================================
+
+app.get('/api/validate', (req, res) => {
+  console.log('✅ Validate requested');
+  res.json({ status: "success", valid: true, message: "Game version is supported" });
+});
+
 app.get('/api/config', (req, res) => {
   console.log('⚙️ Config requested');
   res.json({
@@ -130,13 +197,11 @@ app.get('/api/config', (req, res) => {
   });
 });
 
-// 7. نقطة البنج (Ping)
 app.get('/api/ping', (req, res) => {
   console.log('🏓 Ping requested');
   res.json({ status: 'success', pong: true });
 });
 
-// 8. نقطة المصادقة (Auth)
 app.post('/api/auth', (req, res) => {
   console.log('🔑 Auth requested');
   res.json({
@@ -149,7 +214,6 @@ app.post('/api/auth', (req, res) => {
   });
 });
 
-// 9. نقطة إعادة تعيين الضيف
 app.post('/guest/reset', (req, res) => {
   console.log('🔄 Guest reset requested');
   res.json({
@@ -159,7 +223,6 @@ app.post('/guest/reset', (req, res) => {
   });
 });
 
-// 10. جلب جميع الأغراض
 app.get('/api/items', (req, res) => {
   console.log('📦 Items list requested');
   res.json({
@@ -169,7 +232,6 @@ app.get('/api/items', (req, res) => {
   });
 });
 
-// 11. جلب غرض محدد
 app.get('/api/item/:id', (req, res) => {
   console.log(`🔍 Item ${req.params.id} requested`);
   const item = itemsDB.find(i => i.id == req.params.id);
@@ -179,10 +241,6 @@ app.get('/api/item/:id', (req, res) => {
     res.status(404).json({ status: 'error', message: 'Item not found' });
   }
 });
-
-// ============================================
-// ===== نقاط إضافية شائعة (لتغطية كل الطلبات) =====
-// ============================================
 
 app.get('/api/check', (req, res) => {
   console.log('✅ Check requested');
@@ -223,10 +281,6 @@ app.get('/api/update', (req, res) => {
     latestVersion: 'OB53'
   });
 });
-
-// ============================================
-// ===== نقاط Unity الإضافية (قد تطلبها اللعبة) =====
-// ============================================
 
 app.get('/api/game/version', (req, res) => {
   console.log('🎮 Game version requested');
@@ -270,15 +324,15 @@ app.listen(PORT, '0.0.0.0', () => {
 ║     ███████║   ██║   ██║  ██║██║  ██║██║   ║
 ║     ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝   ║
 ║                                           ║
-║     STRAVEX VIP PROXY (Astutech Clone)    ║
-║          [ FULLY LOGGED ]                 ║
+║     STRAVEX VIP PROXY (FULL MOCK)         ║
+║          [ ALL SERVERS MOCKED ]           ║
 ║                                           ║
 ╚═══════════════════════════════════════════╝
   `);
   console.log(`✅ Server running on port ${PORT}`);
   console.log(`📦 Items loaded: ${itemsDB.length}`);
   console.log(`🌐 URL: https://stravex-vip-proxy.onrender.com`);
-  console.log('\n📋 All endpoints:');
+  console.log('\n📋 All endpoints (including mocked external servers):');
   console.log('  - GET /');
   console.log('  - GET /version');
   console.log('  - GET /versionver.php');
@@ -298,5 +352,10 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log('  - GET /api/game/version');
   console.log('  - POST /api/game/init');
   console.log('  - GET /api/game/status');
+  console.log('  - GET /config.uca.cloud.unity3d.com (mock)');
+  console.log('  - GET /cdp.cloud.unity3d.com (mock)');
+  console.log('  - GET /graph.facebook.com (mock)');
+  console.log('  - GET /rslw0r.inapps.appsflyersdk.com (mock)');
+  console.log('  - GET /firebaselogging-pa.googleapis.com (mock)');
   console.log('  - * (catch-all for any other request)\n');
 });
