@@ -34,10 +34,29 @@ try {
 // ===== نقاط النهاية (مثل Astutech + إضافية) =====
 // ============================================
 
-// 1. الصفحة الرئيسية (404 مثل Astutech)
+// 1. الصفحة الرئيسية (الآن ترد بـ 200)
 app.get('/', (req, res) => {
-  console.log('📄 Root path requested (404)');
-  res.status(404).send('Not Found');
+  console.log('📄 Root path requested (200)');
+  res.json({
+    status: 'success',
+    message: 'STRAVEX VIP PROXY is running',
+    version: '2.0.0',
+    endpoints: {
+      version: '/versionver.php',
+      login: '/api/login',
+      items: '/api/items',
+      validate: '/api/validate',
+      config: '/api/config',
+      ping: '/api/ping',
+      auth: '/api/auth',
+      guest_reset: '/guest/reset',
+      check: '/api/check',
+      status: '/api/status',
+      init: '/api/init',
+      game_config: '/api/game/config',
+      update: '/api/update'
+    }
+  });
 });
 
 // 2. نقطة الإصدارات (verAddr)
@@ -193,7 +212,6 @@ app.get('/api/game/config', (req, res) => {
   });
 });
 
-// نقطة لتحديثات اللعبة (Game Updates)
 app.get('/api/update', (req, res) => {
   console.log('🔄 Update requested');
   res.json({
@@ -239,6 +257,7 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`📦 Items loaded: ${itemsDB.length}`);
   console.log(`🌐 URL: https://stravex-vip-proxy.onrender.com`);
   console.log('\n📋 All endpoints:');
+  console.log('  - GET /');
   console.log('  - GET /version');
   console.log('  - GET /versionver.php');
   console.log('  - POST /api/login');
