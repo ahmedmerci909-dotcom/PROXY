@@ -6,356 +6,102 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ===== تسجيل كل الطلبات (للتحليل) =====
 app.use((req, res, next) => {
   console.log(`📥 ${req.method} ${req.path}`);
-  console.log(`   Headers:`, req.headers);
-  if (req.body && Object.keys(req.body).length > 0) {
-    console.log(`   Body:`, req.body);
-  }
   next();
 });
 
 app.use(cors());
 app.use(express.json());
 
-// ===== تحميل قاعدة البيانات =====
+// ===== قاعدة البيانات =====
 let itemsDB = [];
 try {
   const data = fs.readFileSync(path.join(__dirname, 'items_db.json'), 'utf8');
   itemsDB = JSON.parse(data);
   console.log(`✅ Loaded ${itemsDB.length} items`);
 } catch {
-  console.warn('⚠️ No items database found');
   itemsDB = [];
 }
 
-// ============================================
-// ===== نقاط النهاية الرئيسية =====
-// ============================================
-
-// 1. الصفحة الرئيسية
+// ===== نقاط رئيسية =====
 app.get('/', (req, res) => {
-  console.log('📄 Root path requested (200)');
-  res.json({
-    status: 'success',
-    message: 'STRAVEX VIP PROXY is running',
-    version: '2.0.0',
-    endpoints: {
-      version: '/versionver.php',
-      login: '/api/login',
-      items: '/api/items',
-      validate: '/api/validate',
-      config: '/api/config',
-      ping: '/api/ping',
-      auth: '/api/auth',
-      guest_reset: '/guest/reset',
-      check: '/api/check',
-      status: '/api/status',
-      init: '/api/init',
-      game_config: '/api/game/config',
-      update: '/api/update',
-      game_version: '/api/game/version',
-      game_init: '/api/game/init',
-      game_status: '/api/game/status'
-    }
-  });
+  res.json({ status: 'success', message: 'STRAVEX VIP PROXY (PROXY)', version: '2.0.0' });
 });
 
-// 2. نقطة الإصدارات
-app.get('/version', (req, res) => {
-  console.log('📦 Version requested');
-  res.json({
-    latest: "OB53",
-    supported: ["OB53", "OB52", "OB51", "OB50", "OB49"],
-    forceUpdate: false,
-    updateUrl: "https://stravex-vip-proxy.onrender.com/update"
-  });
-});
-
-// 3. نقطة versionver.php (التي تطلبها اللعبة)
 app.get('/versionver.php', (req, res) => {
-  console.log('📦 versionver.php requested');
-  res.json({
-    latest: "OB53",
-    supported: ["OB53", "OB52", "OB51", "OB50", "OB49"],
-    forceUpdate: false,
-    updateUrl: "https://stravex-vip-proxy.onrender.com/update"
-  });
+  res.json({ latest: "OB53", supported: ["OB53", "OB52", "OB51"], forceUpdate: false });
 });
 
-// 4. نقطة تسجيل الدخول
 app.post('/api/login', (req, res) => {
-  console.log('🔐 Login requested');
-  const userId = req.body.userId || 'guest_' + Date.now();
   res.json({
     status: 'success',
     user: {
-      id: userId,
+      id: 'guest_' + Date.now(),
       name: 'STRAVEX_VIP',
       diamonds: 999999,
       gold: 999999,
-      level: 100,
       items: itemsDB.map(item => item.id)
-    },
-    server: {
-      name: 'STRAVEX VIP PROXY',
-      version: '2.0.0',
-      resetGuest: true
     }
   });
 });
 
-// ============================================
-// ===== محاكاة السيرفرات الخارجية =====
-// ============================================
-
-// Unity
-app.get('/config.uca.cloud.unity3d.com', (req, res) => {
-  console.log('🎮 Unity config requested');
-  res.json({ 
-    status: 'success', 
-    config: { 
-      unityVersion: '2022.3.47f1',
-      analytics: true,
-      features: {
-        ads: true,
-        multiplayer: true
-      }
-    } 
-  });
-});
-
-app.get('/cdp.cloud.unity3d.com', (req, res) => {
-  console.log('📊 Unity analytics requested');
-  res.json({ 
-    status: 'success', 
-    analytics: true,
-    tracking: false,
-    config: { 
-      environment: 'production',
-      version: '1.0.0'
-    }
-  });
-});
-
-// Facebook
-app.get('/graph.facebook.com', (req, res) => {
-  console.log('📘 Facebook requested');
-  res.json({ 
-    status: 'success', 
-    data: { 
-      id: 'fake_facebook_id_' + Date.now(),
-      name: 'Guest User'
-    }
-  });
-});
-
-// AppsFlyer (إعلانات)
-app.get('/rslw0r.inapps.appsflyersdk.com', (req, res) => {
-  console.log('📱 AppsFlyer requested');
-  res.json({ 
-    status: 'success',
-    ads: {
-      enabled: false,
-      url: 'https://example.com/ads'
-    }
-  });
-});
-
-// Firebase
-app.get('/firebaselogging-pa.googleapis.com', (req, res) => {
-  console.log('🔥 Firebase logging requested');
-  res.json({ 
-    status: 'success',
-    logging: {
-      enabled: true,
-      level: 'info'
-    }
-  });
-});
-
-// ============================================
-// ===== نقاط أخرى =====
-// ============================================
-
-app.get('/api/validate', (req, res) => {
-  console.log('✅ Validate requested');
-  res.json({ status: "success", valid: true, message: "Game version is supported" });
-});
-
-app.get('/api/config', (req, res) => {
-  console.log('⚙️ Config requested');
-  res.json({
-    status: "success",
-    config: {
-      gameVersion: "OB53",
-      serverTime: Date.now(),
-      maintenance: false,
-      maxPlayers: 500
-    }
-  });
-});
-
-app.get('/api/ping', (req, res) => {
-  console.log('🏓 Ping requested');
-  res.json({ status: 'success', pong: true });
-});
-
-app.post('/api/auth', (req, res) => {
-  console.log('🔑 Auth requested');
-  res.json({
-    status: 'success',
-    token: 'fake_token_' + Date.now(),
-    user: {
-      id: 'guest_' + Date.now(),
-      name: 'STRAVEX_VIP'
-    }
-  });
-});
-
-app.post('/guest/reset', (req, res) => {
-  console.log('🔄 Guest reset requested');
-  res.json({
-    status: 'success',
-    guestId: 'guest_' + Date.now(),
-    reset: true
-  });
-});
-
-app.get('/api/items', (req, res) => {
-  console.log('📦 Items list requested');
-  res.json({
-    status: 'success',
-    total: itemsDB.length,
-    items: itemsDB
-  });
-});
-
-app.get('/api/item/:id', (req, res) => {
-  console.log(`🔍 Item ${req.params.id} requested`);
-  const item = itemsDB.find(i => i.id == req.params.id);
-  if (item) {
-    res.json({ status: 'success', item });
-  } else {
-    res.status(404).json({ status: 'error', message: 'Item not found' });
+// ===== إعادة توجيه السيرفرات الخارجية (PROXY) =====
+app.get('/config.uca.cloud.unity3d.com', async (req, res) => {
+  try {
+    const response = await fetch('https://config.uca.cloud.unity3d.com' + req.url);
+    const data = await response.json();
+    res.json(data);
+  } catch {
+    res.json({ status: 'success', config: { unityVersion: '2022.3.47f1' } });
   }
 });
 
-app.get('/api/check', (req, res) => {
-  console.log('✅ Check requested');
-  res.json({ status: 'success', message: 'OK' });
+app.get('/cdp.cloud.unity3d.com', async (req, res) => {
+  try {
+    const response = await fetch('https://cdp.cloud.unity3d.com' + req.url);
+    const data = await response.json();
+    res.json(data);
+  } catch {
+    res.json({ status: 'success', analytics: true });
+  }
 });
 
-app.get('/api/status', (req, res) => {
-  console.log('📊 Status requested');
-  res.json({ status: 'success', game: 'Free Fire', version: 'OB53' });
+app.get('/graph.facebook.com', async (req, res) => {
+  try {
+    const response = await fetch('https://graph.facebook.com' + req.url);
+    const data = await response.json();
+    res.json(data);
+  } catch {
+    res.json({ status: 'success', data: { id: 'fake_id' } });
+  }
 });
 
-app.post('/api/init', (req, res) => {
-  console.log('🚀 Init requested');
-  res.json({
-    status: 'success',
-    sessionId: 'session_' + Date.now(),
-    serverTime: Date.now()
-  });
+app.get('/rslw0r.inapps.appsflyersdk.com', async (req, res) => {
+  try {
+    const response = await fetch('https://rslw0r.inapps.appsflyersdk.com' + req.url);
+    const data = await response.json();
+    res.json(data);
+  } catch {
+    res.json({ status: 'success', ads: { enabled: false } });
+  }
 });
 
-app.get('/api/game/config', (req, res) => {
-  console.log('🎮 Game config requested');
-  res.json({
-    status: 'success',
-    config: {
-      map: 'Bermuda',
-      maxPlayers: 50,
-      gameMode: 'Battle Royale'
-    }
-  });
+app.get('/firebaselogging-pa.googleapis.com', async (req, res) => {
+  try {
+    const response = await fetch('https://firebaselogging-pa.googleapis.com' + req.url);
+    const data = await response.json();
+    res.json(data);
+  } catch {
+    res.json({ status: 'success', logging: { enabled: true } });
+  }
 });
 
-app.get('/api/update', (req, res) => {
-  console.log('🔄 Update requested');
-  res.json({
-    status: 'success',
-    updateAvailable: false,
-    latestVersion: 'OB53'
-  });
-});
-
-app.get('/api/game/version', (req, res) => {
-  console.log('🎮 Game version requested');
-  res.json({ status: 'success', version: 'OB53' });
-});
-
-app.post('/api/game/init', (req, res) => {
-  console.log('🎮 Game init requested');
-  res.json({ status: 'success', sessionId: 'session_' + Date.now() });
-});
-
-app.get('/api/game/status', (req, res) => {
-  console.log('🎮 Game status requested');
-  res.json({ status: 'success', status: 'online' });
-});
-
-// ============================================
-// ===== نقطة عامة (Catch-All) للتشخيص =====
-// ============================================
+// ===== نقطة عامة =====
 app.all('*', (req, res) => {
-  console.log(`⚠️ Unhandled request: ${req.method} ${req.path}`);
-  res.json({
-    status: 'success',
-    message: 'Endpoint received (catch-all)',
-    method: req.method,
-    path: req.path,
-    body: req.body,
-    query: req.query
-  });
+  res.json({ status: 'success', message: 'Catch-all (PROXY)', path: req.path });
 });
 
-// ===== تشغيل السيرفر =====
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`
-╔═══════════════════════════════════════════╗
-║                                           ║
-║     ███████╗████████╗██████╗  █████╗ ██╗   ║
-║     ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗██║   ║
-║     ███████╗   ██║   ██████╔╝███████║██║   ║
-║     ╚════██║   ██║   ██╔══██╗██╔══██║██║   ║
-║     ███████║   ██║   ██║  ██║██║  ██║██║   ║
-║     ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝   ║
-║                                           ║
-║     STRAVEX VIP PROXY (FULL MOCK)         ║
-║          [ ALL SERVERS MOCKED ]           ║
-║                                           ║
-╚═══════════════════════════════════════════╝
-  `);
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log(`📦 Items loaded: ${itemsDB.length}`);
-  console.log(`🌐 URL: https://stravex-vip-proxy.onrender.com`);
-  console.log('\n📋 All endpoints (including mocked external servers):');
-  console.log('  - GET /');
-  console.log('  - GET /version');
-  console.log('  - GET /versionver.php');
-  console.log('  - POST /api/login');
-  console.log('  - GET /api/validate');
-  console.log('  - GET /api/config');
-  console.log('  - GET /api/ping');
-  console.log('  - POST /api/auth');
-  console.log('  - POST /guest/reset');
-  console.log('  - GET /api/items');
-  console.log('  - GET /api/item/:id');
-  console.log('  - GET /api/check');
-  console.log('  - GET /api/status');
-  console.log('  - POST /api/init');
-  console.log('  - GET /api/game/config');
-  console.log('  - GET /api/update');
-  console.log('  - GET /api/game/version');
-  console.log('  - POST /api/game/init');
-  console.log('  - GET /api/game/status');
-  console.log('  - GET /config.uca.cloud.unity3d.com (mock)');
-  console.log('  - GET /cdp.cloud.unity3d.com (mock)');
-  console.log('  - GET /graph.facebook.com (mock)');
-  console.log('  - GET /rslw0r.inapps.appsflyersdk.com (mock)');
-  console.log('  - GET /firebaselogging-pa.googleapis.com (mock)');
-  console.log('  - * (catch-all for any other request)\n');
+  console.log(`✅ STRAVEX PROXY (PROXY) running on port ${PORT}`);
 });
