@@ -6,13 +6,14 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(cors());
+app.use(express.json());
+
+// ===== تسجيل الطلبات =====
 app.use((req, res, next) => {
   console.log(`📥 ${req.method} ${req.path}`);
   next();
 });
-
-app.use(cors());
-app.use(express.json());
 
 // ===== قاعدة البيانات =====
 let itemsDB = [];
@@ -24,54 +25,71 @@ try {
   itemsDB = [];
 }
 
-// ===== نقاط رئيسية =====
-app.get('/', (req, res) => {
-  res.json({ status: 'success', message: 'STRAVEX VIP PROXY (MOCK)', version: '2.0.0' });
-});
+// ============================================
+// ===== محاكاة نقاط Astutech فقط =====
+// ============================================
 
+// 1. نقطة الإصدارات (version.astutech.online)
 app.get('/versionver.php', (req, res) => {
-  res.json({ latest: "OB53", supported: ["OB53", "OB52", "OB51"], forceUpdate: false });
+  console.log('📦 versionver.php requested');
+  res.json({
+    latest: "OB53",
+    supported: ["OB53", "OB52", "OB51", "OB50", "OB49"],
+    forceUpdate: false,
+    updateUrl: "https://stravex-vip-proxy.onrender.com/update"
+  });
 });
 
-app.post('/api/login', (req, res) => {
+// 2. نقطة المصادقة (authsrv1.astutech.online)
+app.post('/auth', (req, res) => {
+  console.log('🔑 Auth requested');
   res.json({
-    status: 'success',
+    status: "success",
+    token: "fake_token_" + Date.now(),
+    sessionId: "session_" + Date.now(),
     user: {
-      id: 'guest_' + Date.now(),
-      name: 'STRAVEX_VIP',
-      diamonds: 999999,
-      gold: 999999,
-      items: itemsDB.map(item => item.id)
+      id: "guest_" + Date.now(),
+      name: "STRAVEX_VIP"
     }
   });
 });
 
-// ===== محاكاة السيرفرات الخارجية (MOCK) =====
-app.get('/config.uca.cloud.unity3d.com', (req, res) => {
-  res.json({ status: 'success', config: { unityVersion: '2022.3.47f1' } });
+// 3. نقطة تسجيل الدخول (srv0010.astutech.online)
+app.post('/api/login', (req, res) => {
+  console.log('🔐 Login requested');
+  res.json({
+    status: "success",
+    user: {
+      id: "guest_" + Date.now(),
+      name: "STRAVEX_VIP",
+      diamonds: 999999,
+      gold: 999999,
+      level: 100,
+      items: itemsDB.map(item => item.id)
+    },
+    server: {
+      name: "STRAVEX VIP PROXY",
+      version: "2.0.0",
+      resetGuest: true
+    }
+  });
 });
 
-app.get('/cdp.cloud.unity3d.com', (req, res) => {
-  res.json({ status: 'success', analytics: true });
-});
-
-app.get('/graph.facebook.com', (req, res) => {
-  res.json({ status: 'success', data: { id: 'fake_facebook_id' } });
-});
-
-app.get('/rslw0r.inapps.appsflyersdk.com', (req, res) => {
-  res.json({ status: 'success', ads: { enabled: false } });
-});
-
-app.get('/firebaselogging-pa.googleapis.com', (req, res) => {
-  res.json({ status: 'success', logging: { enabled: true } });
-});
-
-// ===== نقطة عامة =====
+// ============================================
+// ===== نقطة عامة لأي طلب آخر =====
+// ============================================
 app.all('*', (req, res) => {
-  res.json({ status: 'success', message: 'Catch-all (MOCK)', path: req.path });
+  console.log(`⚠️ Unhandled: ${req.method} ${req.path}`);
+  res.json({
+    status: "success",
+    message: "Request received",
+    path: req.path,
+    method: req.method
+  });
 });
 
+// ===== تشغيل السيرفر =====
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ STRAVEX PROXY (MOCK) running on port ${PORT}`);
+  console.log(`✅ STRAVEX PROXY (Astutech Clone) running on port ${PORT}`);
+  console.log(`📦 Items loaded: ${itemsDB.length}`);
 });
