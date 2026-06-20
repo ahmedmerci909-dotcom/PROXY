@@ -9,10 +9,9 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// ===== الشعار المخصص (سيظهر بعد تسجيل الدخول) =====
+// ===== الشعار المخصص =====
 const SPLASH_BANNER = `
 ╔═══════════════════════════════════════════╗
-║                                           ║
 ║     ███████╗████████╗██████╗  █████╗ ██╗   ║
 ║     ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗██║   ║
 ║     ███████╗   ██║   ██████╔╝███████║██║   ║
@@ -20,37 +19,10 @@ const SPLASH_BANNER = `
 ║     ███████║   ██║   ██║  ██║██║  ██║██║   ║
 ║     ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝   ║
 ║                                           ║
-║     ██╗   ██╗██╗██████╗  ██████╗  ██████╗  ║
-║     ██║   ██║██║██╔══██╗██╔═══██╗██╔═══██╗ ║
-║     ██║   ██║██║██████╔╝██║   ██║██║   ██║ ║
-║     ╚██╗ ██╔╝██║██╔═══╝ ██║   ██║██║   ██║ ║
-║      ╚████╔╝ ██║██║     ╚██████╔╝╚██████╔╝ ║
-║       ╚═══╝  ╚═╝╚═╝      ╚═════╝  ╚═════╝  ║
-║                                           ║
-║          [ PROXY SERVERS ]                 ║
-║                                           ║
+║     STRAVEX VIP PROXY                     ║
+║          [ ACTIVE ]                       ║
 ╚═══════════════════════════════════════════╝
 `;
-
-// ===== الإعدادات المدمجة (مشابهة لـ Astutech) =====
-const CONFIG = {
-  serverName: "STRAVEX VIP PROXY",
-  version: "2.0.0",
-  resetGuest: true,
-  features: {
-    unlockAllItems: true,
-    infiniteDiamonds: true,
-    infiniteGold: true
-  }
-};
-
-// ===== إصدارات اللعبة (مشابهة لـ Astutech) =====
-const VERSIONS = {
-  latest: "OB53",
-  supported: ["OB53", "OB52", "OB51", "OB50", "OB49"],
-  forceUpdate: false,
-  updateUrl: "https://your-app-name.onrender.com/update"
-};
 
 // ===== تحميل قاعدة البيانات =====
 let itemsDB = [];
@@ -67,40 +39,61 @@ try {
 // ===== نقاط النهاية (Endpoints) =====
 // ============================================
 
-// 1. الصفحة الرئيسية
+// الصفحة الرئيسية
 app.get('/', (req, res) => {
   res.json({
     status: 'online',
-    server: CONFIG.serverName,
-    version: CONFIG.version,
+    server: 'STRAVEX VIP PROXY',
+    version: '2.0.0',
     endpoints: {
       version: '/version',
-      guest_reset: '/guest/reset',
       login: '/api/login',
       items: '/api/items',
-      item: '/api/item/:id'
+      item: '/api/item/:id',
+      validate: '/api/validate',
+      player: '/api/player'
     }
   });
 });
 
-// 2. نقطة التحديثات (مشابهة لـ Astutech)
+// === نقاط Astutech-style ===
 app.get('/version', (req, res) => {
-  res.json(VERSIONS);
-});
-
-// 3. نقطة إعادة تعيين الضيف (مشابهة لـ Astutech)
-app.post('/guest/reset', (req, res) => {
-  const newGuestId = 'guest_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
   res.json({
-    status: 'success',
-    guestId: newGuestId,
-    reset: true
+    latest: "OB53",
+    supported: ["OB53", "OB52", "OB51", "OB50", "OB49"],
+    forceUpdate: false,
+    updateUrl: "https://stravex-vip-proxy.onrender.com/update"
   });
 });
 
-// 4. نقطة تسجيل الدخول (בה מופיע الشعار)
+app.get('/api/validate', (req, res) => {
+  res.json({
+    status: "success",
+    valid: true,
+    message: "Game version is supported"
+  });
+});
+
+app.post('/api/player', (req, res) => {
+  const userId = req.body.userId || 'guest';
+  res.json({
+    status: "success",
+    user: {
+      id: userId,
+      name: "STRAVEX_VIP",
+      diamonds: 999999,
+      gold: 999999,
+      level: 100,
+      items: itemsDB.map(item => item.id)
+    },
+    splash: SPLASH_BANNER,
+    message: "🔥 STRAVEX VIP PROXY | All Items Unlocked!"
+  });
+});
+
+// === نقاط السيرفر الأساسية ===
 app.post('/api/login', (req, res) => {
-  const userId = req.body.userId || 'guest_' + Date.now();
+  const userId = req.body.userId || 'guest';
   res.json({
     status: 'success',
     user: {
@@ -111,17 +104,11 @@ app.post('/api/login', (req, res) => {
       level: 100,
       items: itemsDB.map(item => item.id)
     },
-    splash: SPLASH_BANNER,  // ← الشعار يظهر هنا
-    message: '🔥 STRAVEX VIP PROXY | All Items Unlocked!',
-    server: {
-      name: CONFIG.serverName,
-      version: CONFIG.version,
-      resetGuest: CONFIG.resetGuest
-    }
+    splash: SPLASH_BANNER,
+    message: '🔥 STRAVEX VIP PROXY | All Items Unlocked!'
   });
 });
 
-// 5. جلب جميع الأغراض
 app.get('/api/items', (req, res) => {
   res.json({
     status: 'success',
@@ -130,7 +117,6 @@ app.get('/api/items', (req, res) => {
   });
 });
 
-// 6. جلب غرض محدد بالمعرف
 app.get('/api/item/:id', (req, res) => {
   const item = itemsDB.find(i => i.id == req.params.id);
   if (item) {
@@ -142,6 +128,7 @@ app.get('/api/item/:id', (req, res) => {
 
 // ===== تشغيل السيرفر =====
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ ${CONFIG.serverName} running on port ${PORT}`);
+  console.log(SPLASH_BANNER);
+  console.log(`✅ STRAVEX VIP PROXY running on port ${PORT}`);
   console.log(`📦 Items loaded: ${itemsDB.length}`);
 });
