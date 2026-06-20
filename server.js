@@ -54,7 +54,10 @@ app.get('/', (req, res) => {
       status: '/api/status',
       init: '/api/init',
       game_config: '/api/game/config',
-      update: '/api/update'
+      update: '/api/update',
+      game_version: '/api/game/version',
+      game_init: '/api/game/init',
+      game_status: '/api/game/status'
     }
   });
 });
@@ -222,6 +225,25 @@ app.get('/api/update', (req, res) => {
 });
 
 // ============================================
+// ===== نقاط Unity الإضافية (قد تطلبها اللعبة) =====
+// ============================================
+
+app.get('/api/game/version', (req, res) => {
+  console.log('🎮 Game version requested');
+  res.json({ status: 'success', version: 'OB53' });
+});
+
+app.post('/api/game/init', (req, res) => {
+  console.log('🎮 Game init requested');
+  res.json({ status: 'success', sessionId: 'session_' + Date.now() });
+});
+
+app.get('/api/game/status', (req, res) => {
+  console.log('🎮 Game status requested');
+  res.json({ status: 'success', status: 'online' });
+});
+
+// ============================================
 // ===== نقطة عامة (Catch-All) للتشخيص =====
 // ============================================
 app.all('*', (req, res) => {
@@ -273,5 +295,8 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log('  - POST /api/init');
   console.log('  - GET /api/game/config');
   console.log('  - GET /api/update');
+  console.log('  - GET /api/game/version');
+  console.log('  - POST /api/game/init');
+  console.log('  - GET /api/game/status');
   console.log('  - * (catch-all for any other request)\n');
 });
