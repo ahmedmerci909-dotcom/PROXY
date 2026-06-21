@@ -9,9 +9,13 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// ===== تسجيل الطلبات =====
+// ===== تسجيل جميع الطلبات (للتحليل) =====
 app.use((req, res, next) => {
   console.log(`📥 ${req.method} ${req.path}`);
+  console.log(`   Headers:`, req.headers);
+  if (req.body && Object.keys(req.body).length > 0) {
+    console.log(`   Body:`, req.body);
+  }
   next();
 });
 
@@ -22,14 +26,13 @@ try {
   itemsDB = JSON.parse(data);
   console.log(`✅ Loaded ${itemsDB.length} items`);
 } catch {
+  console.warn('⚠️ No items database found');
   itemsDB = [];
 }
 
 // ============================================
-// ===== محاكاة نقاط Astutech =====
+// ===== نقطة الإصدارات (المسار الصحيح) =====
 // ============================================
-
-// 1. نقطة الإصدارات (تحل محل ggwhitehawk.com)
 app.get('/versionver.php', (req, res) => {
   console.log('📦 versionver.php requested');
   res.json({
@@ -40,7 +43,44 @@ app.get('/versionver.php', (req, res) => {
   });
 });
 
-// 2. نقطة تسجيل الدخول (تحل محل loginbp.ggpolarbear.com)
+// ============================================
+// ===== نقاط محتملة (قد تطلبها اللعبة) =====
+// ============================================
+app.get('/version', (req, res) => {
+  console.log('📦 /version requested');
+  res.json({
+    latest: "OB53",
+    supported: ["OB53", "OB52", "OB51", "OB50", "OB49"],
+    forceUpdate: false
+  });
+});
+
+app.get('/api/version', (req, res) => {
+  console.log('📦 /api/version requested');
+  res.json({ version: "OB53", supported: ["OB53", "OB52", "OB51"] });
+});
+
+app.get('/config', (req, res) => {
+  console.log('⚙️ /config requested');
+  res.json({
+    gameVersion: "OB53",
+    serverTime: Date.now(),
+    maintenance: false
+  });
+});
+
+app.get('/api/config', (req, res) => {
+  console.log('⚙️ /api/config requested');
+  res.json({
+    gameVersion: "OB53",
+    serverTime: Date.now(),
+    maintenance: false
+  });
+});
+
+// ============================================
+// ===== نقاط تسجيل الدخول والمصادقة =====
+// ============================================
 app.post('/api/login', (req, res) => {
   console.log('🔐 Login requested');
   res.json({
@@ -61,26 +101,58 @@ app.post('/api/login', (req, res) => {
   });
 });
 
-// 3. نقطة المصادقة (تحل محل clientbp.ggpolarbear.com)
 app.post('/auth', (req, res) => {
   console.log('🔑 Auth requested');
   res.json({
     status: "success",
     token: "fake_token_" + Date.now(),
-    sessionId: "session_" + Date.now(),
-    user: {
-      id: "guest_" + Date.now(),
-      name: "STRAVEX_VIP"
-    }
+    sessionId: "session_" + Date.now()
+  });
+});
+
+app.post('/api/auth', (req, res) => {
+  console.log('🔑 /api/auth requested');
+  res.json({
+    status: "success",
+    token: "fake_token_" + Date.now(),
+    sessionId: "session_" + Date.now()
   });
 });
 
 // ============================================
-// ===== نقاط عامة لأي طلب آخر (404 مثل Astutech) =====
+// ===== نقاط الأغراض =====
+// ============================================
+app.get('/api/items', (req, res) => {
+  console.log('📦 Items requested');
+  res.json({
+    status: "success",
+    total: itemsDB.length,
+    items: itemsDB
+  });
+});
+
+app.get('/items', (req, res) => {
+  console.log('📦 /items requested');
+  res.json({
+    status: "success",
+    total: itemsDB.length,
+    items: itemsDB
+  });
+});
+
+// ============================================
+// ===== نقطة عامة (Catch-All) للتشخيص =====
 // ============================================
 app.all('*', (req, res) => {
   console.log(`⚠️ Unhandled: ${req.method} ${req.path}`);
-  res.status(404).send('Not Found');
+  res.json({
+    status: "success",
+    message: "Request received (catch-all)",
+    path: req.path,
+    method: req.method,
+    query: req.query,
+    body: req.body
+  });
 });
 
 // ===== تشغيل السيرفر =====
@@ -88,16 +160,14 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`
 ╔═══════════════════════════════════════════╗
 ║                                           ║
-║     STRAVEX VIP PROXY                     ║
-║     (Astutech Full Clone)                 ║
+║     STRAVEX VIP PROXY (CATCH-ALL)         ║
+║           Path Detector                    ║
 ║                                           ║
 ╚═══════════════════════════════════════════╝
   `);
   console.log(`✅ Server running on port ${PORT}`);
   console.log(`📦 Items loaded: ${itemsDB.length}`);
   console.log(`🌐 URL: https://stravex-vip-proxy.onrender.com`);
-  console.log(`\n📋 Endpoints (replace ggwhitehawk, ggpolarbear, ggblueshark):`);
-  console.log(`   - /versionver.php (replaces version.ggwhitehawk.com)`);
-  console.log(`   - /api/login (replaces loginbp.ggpolarbear.com)`);
-  console.log(`   - /auth (replaces clientbp.ggpolarbear.com)\n`);
+  console.log(`\n📋 All requests will be logged and responded to.`);
+  console.log(`   Check Render logs to see the exact path requested.\n`);
 });
