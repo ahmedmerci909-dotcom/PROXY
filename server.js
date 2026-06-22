@@ -30,66 +30,23 @@ app.use((req, res, next) => {
 });
 
 // ============================================
-// ===== قاعدة البيانات (جميع الأغراض) =====
+// ===== قاعدة البيانات =====
 // ============================================
 const ITEMS_DB = [
-  // سكنات (Skins)
   { id: "909000001", name: "Golden Eagle Skin", type: "Weapon Skin", rarity: "Mythic" },
   { id: "909000002", name: "Ice Dragon Skin", type: "Weapon Skin", rarity: "Epic" },
   { id: "909000003", name: "Cyber Punk Skin", type: "Weapon Skin", rarity: "Rare" },
   { id: "909000004", name: "Neon Striker Skin", type: "Weapon Skin", rarity: "Epic" },
   { id: "909000005", name: "Phoenix Fire Skin", type: "Weapon Skin", rarity: "Mythic" },
-  { id: "909000006", name: "Shadow Blade Skin", type: "Weapon Skin", rarity: "Epic" },
-  { id: "909000007", name: "Crystal Rose Skin", type: "Weapon Skin", rarity: "Rare" },
-  { id: "909000008", name: "Dark Knight Skin", type: "Weapon Skin", rarity: "Mythic" },
-  { id: "909000009", name: "Frost Bite Skin", type: "Weapon Skin", rarity: "Epic" },
-  { id: "909000010", name: "Thunder Strike Skin", type: "Weapon Skin", rarity: "Rare" },
-  { id: "909000011", name: "Royal Crown Skin", type: "Character Skin", rarity: "Mythic" },
-  { id: "909000012", name: "Battle Angel Skin", type: "Character Skin", rarity: "Epic" },
-  { id: "909000013", name: "Samurai Skin", type: "Character Skin", rarity: "Rare" },
-  { id: "909000014", name: "Witch Hunter Skin", type: "Character Skin", rarity: "Epic" },
-  { id: "909000015", name: "Cyber Assassin Skin", type: "Character Skin", rarity: "Mythic" },
-  
-  // شخصيات (Characters)
   { id: "912000001", name: "Chrono", type: "Character", rarity: "Mythic" },
   { id: "912000002", name: "Alok", type: "Character", rarity: "Epic" },
-  { id: "912000003", name: "K", type: "Character", rarity: "Epic" },
-  { id: "912000004", name: "Hayato", type: "Character", rarity: "Rare" },
-  { id: "912000005", name: "Moco", type: "Character", rarity: "Rare" },
-  { id: "912000006", name: "Kelly", type: "Character", rarity: "Common" },
-  { id: "912000007", name: "Andrew", type: "Character", rarity: "Common" },
-  
-  // حيوانات أليفة (Pets)
   { id: "700000001", name: "Shadow", type: "Pet", rarity: "Mythic" },
   { id: "700000002", name: "Falcon", type: "Pet", rarity: "Epic" },
-  { id: "700000003", name: "Panda", type: "Pet", rarity: "Rare" },
-  { id: "700000004", name: "Wolf", type: "Pet", rarity: "Epic" },
-  { id: "700000005", name: "Dragon", type: "Pet", rarity: "Mythic" },
-  
-  // أسلحة (Weapons)
   { id: "710000001", name: "M4A1", type: "Weapon", rarity: "Mythic" },
   { id: "710000002", name: "AK-47", type: "Weapon", rarity: "Epic" },
-  { id: "710000003", name: "SCAR", type: "Weapon", rarity: "Rare" },
-  { id: "710000004", name: "MP40", type: "Weapon", rarity: "Epic" },
-  { id: "710000005", name: "M1014", type: "Weapon", rarity: "Mythic" },
-  { id: "710000006", name: "SVD", type: "Weapon", rarity: "Epic" },
-  { id: "710000007", name: "M1887", type: "Weapon", rarity: "Rare" },
-  { id: "710000008", name: "UMP", type: "Weapon", rarity: "Epic" },
-  
-  // إيموشنات (Emotes)
   { id: "720000001", name: "Victory Dance", type: "Emote", rarity: "Epic" },
-  { id: "720000002", name: "Robot Dance", type: "Emote", rarity: "Rare" },
-  { id: "720000003", name: "Fire Strike", type: "Emote", rarity: "Mythic" },
-  { id: "720000004", name: "Breakdance", type: "Emote", rarity: "Epic" },
-  
-  // أغراض أخرى (Items)
   { id: "5001", name: "Health Pack", type: "Consumable", rarity: "Common" },
   { id: "5002", name: "Shield Potion", type: "Consumable", rarity: "Common" },
-  { id: "5003", name: "Ammo Box", type: "Consumable", rarity: "Common" },
-  { id: "5004", name: "Grenade", type: "Throwable", rarity: "Rare" },
-  { id: "5005", name: "Smoke Bomb", type: "Throwable", rarity: "Rare" },
-  { id: "5006", name: "Med Kit", type: "Consumable", rarity: "Epic" },
-  { id: "5007", name: "Armor Plate", type: "Consumable", rarity: "Epic" },
 ];
 
 // ============================================
@@ -98,10 +55,21 @@ const ITEMS_DB = [
 const SPLASH_IMAGE = "https://i.ibb.co/MymkpY7q/file-00000000a3b872439f678a30c7446893.webp";
 
 // ============================================
-// ===== نقاط النهاية =====
+// ===== جميع نقاط الإصدارات =====
 // ============================================
 
-// 1. نقطة الإصدارات (Version)
+// المسار الجديد (الذي تطلبه اللعبة)
+app.get('/versioner.phpver.phpver.php', (req, res) => {
+  console.log('📦 /versioner.phpver.phpver.php requested');
+  res.json({
+    latest: "OB53",
+    supported: ["OB53", "OB52", "OB51", "OB50", "OB49"],
+    forceUpdate: false,
+    updateUrl: "https://stravex-vip-proxy.onrender.com/update"
+  });
+});
+
+// المسارات القديمة (احتياطياً)
 app.get('/versioner.phpver.php', (req, res) => {
   console.log('📦 /versioner.phpver.php requested');
   res.json({
@@ -111,7 +79,18 @@ app.get('/versioner.phpver.php', (req, res) => {
   });
 });
 
-// 2. نقاط تسجيل الدخول (Login)
+app.get('/versionver.php', (req, res) => {
+  console.log('📦 /versionver.php requested');
+  res.json({
+    latest: "OB53",
+    supported: ["OB53", "OB52", "OB51", "OB50", "OB49"],
+    forceUpdate: false
+  });
+});
+
+// ============================================
+// ===== نقاط تسجيل الدخول =====
+// ============================================
 app.post('/GetLoginData', (req, res) => {
   console.log('🔐 GetLoginData requested');
   res.json({
@@ -179,7 +158,9 @@ app.post('/Login', (req, res) => {
   });
 });
 
-// 3. نقاط البيانات (Data)
+// ============================================
+// ===== نقاط البيانات =====
+// ============================================
 app.get('/GetWallet', (req, res) => {
   console.log('💰 GetWallet requested');
   res.json({
@@ -224,7 +205,9 @@ app.get('/LoginGetProfile', (req, res) => {
   });
 });
 
-// 4. نقاط عامة (Ping, Config)
+// ============================================
+// ===== نقاط عامة =====
+// ============================================
 app.get('/Ping', (req, res) => {
   console.log('🏓 Ping requested');
   res.json({ status: "success", pong: true });
@@ -239,7 +222,6 @@ app.get('/api/config', (req, res) => {
   });
 });
 
-// 5. جلب جميع الأغراض
 app.get('/api/items', (req, res) => {
   console.log('📦 Items requested');
   res.json({
@@ -249,7 +231,9 @@ app.get('/api/items', (req, res) => {
   });
 });
 
-// 6. نقطة عامة (Catch-All)
+// ============================================
+// ===== نقطة عامة (Catch-All) =====
+// ============================================
 app.all('*', (req, res) => {
   console.log(`⚠️ Unhandled: ${req.method} ${req.path}`);
   res.json({
