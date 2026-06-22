@@ -6,15 +6,6 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// ===== تسجيل الطلبات =====
-app.use((req, res, next) => {
-  console.log(`📥 ${req.method} ${req.path}`);
-  if (req.body && Object.keys(req.body).length > 0) {
-    console.log(`   Body:`, req.body);
-  }
-  next();
-});
-
 // ===== قاعدة البيانات =====
 const ITEMS_DB = [
   { id: "909000001", name: "Golden Eagle Skin", type: "Weapon Skin", rarity: "Mythic" },
@@ -24,95 +15,10 @@ const ITEMS_DB = [
 ];
 
 // ============================================
-// ===== نقاط النهاية الأساسية =====
+// ===== نقاط النهاية =====
 // ============================================
 
-// 1. Ping (الرقم 2)
-app.get('/Ping', (req, res) => {
-  console.log('🏓 Ping requested');
-  res.json({ status: "success", pong: true });
-});
-
-// 2. Login (الرقم 3)
-app.post('/Login', (req, res) => {
-  console.log('🔐 Login requested');
-  res.json({
-    status: "success",
-    userId: "STRAVEX_" + Date.now(),
-    token: "fake_token_" + Date.now()
-  });
-});
-
-// 3. GetWallet (الرقم 8)
-app.get('/GetWallet', (req, res) => {
-  console.log('💰 GetWallet requested');
-  res.json({ status: "success", diamonds: 99999999, gold: 99999999 });
-});
-
-// 4. GetBackpack (الرقم 9)
-app.get('/GetBackpack', (req, res) => {
-  console.log('🎒 GetBackpack requested');
-  res.json({ status: "success", items: ITEMS_DB });
-});
-
-// 5. GetStore (الرقم 40)
-app.get('/GetStore', (req, res) => {
-  console.log('🏪 GetStore requested');
-  res.json({ status: "success", store: ITEMS_DB });
-});
-
-// 6. LoginGetProfile (الرقم 108)
-app.get('/LoginGetProfile', (req, res) => {
-  console.log('👤 LoginGetProfile requested');
-  res.json({
-    status: "success",
-    profile: {
-      id: "STRAVEX_" + Date.now(),
-      name: "STRAVEX_VIP",
-      level: 100,
-      diamonds: 99999999,
-      gold: 99999999,
-      items: ITEMS_DB.map(item => item.id)
-    }
-  });
-});
-
-// 7. LoginGetSplash (الرقم 55)
-app.get('/LoginGetSplash', (req, res) => {
-  console.log('🖼️ LoginGetSplash requested');
-  res.json({
-    status: "success",
-    splash: {
-      type: "image",
-      url: "https://i.ibb.co/MymkpY7q/file-00000000a3b872439f678a30c7446893.webp",
-      text: "STRAVE Z FUEAR"
-    }
-  });
-});
-
-// 8. MajorLogin (الرقم 352)
-app.post('/MajorLogin', (req, res) => {
-  console.log('🔑 MajorLogin requested');
-  res.json({
-    status: "success",
-    sessionId: "session_" + Date.now(),
-    user: {
-      id: "STRAVEX_" + Date.now(),
-      name: "STRAVEX_VIP",
-      diamonds: 99999999,
-      gold: 99999999,
-      level: 100,
-      items: ITEMS_DB.map(item => item.id)
-    },
-    splash: {
-      type: "image",
-      url: "https://i.ibb.co/MymkpY7q/file-00000000a3b872439f678a30c7446893.webp",
-      text: "STRAVE Z FUEAR"
-    }
-  });
-});
-
-// 9. GetLoginData (الرقم 354)
+// 1. GetLoginData (من الكود)
 app.post('/GetLoginData', (req, res) => {
   console.log('🔐 GetLoginData requested');
   res.json({
@@ -144,9 +50,59 @@ app.post('/GetLoginData', (req, res) => {
   });
 });
 
-// ============================================
-// ===== نقطة عامة (Catch-All) =====
-// ============================================
+// 2. MajorLogin (من الكود)
+app.post('/MajorLogin', (req, res) => {
+  console.log('🔑 MajorLogin requested');
+  res.json({
+    status: "success",
+    sessionId: "session_" + Date.now(),
+    user: {
+      id: "STRAVEX_" + Date.now(),
+      name: "STRAVEX_VIP",
+      diamonds: 99999999,
+      gold: 99999999,
+      level: 100,
+      items: ITEMS_DB.map(item => item.id)
+    },
+    splash: {
+      type: "image",
+      url: "https://i.ibb.co/MymkpY7q/file-00000000a3b872439f678a30c7446893.webp",
+      text: "STRAVE Z FUEAR"
+    },
+    message: "🔥 STRAVEX VIP PROXY | All Items Unlocked!"
+  });
+});
+
+// 3. Guest Token (من الكود)
+app.post('/oauth/guest/token/grant', (req, res) => {
+  console.log('🔑 Guest token requested');
+  res.json({
+    access_token: "fake_token_" + Date.now(),
+    open_id: "fake_open_id_" + Date.now(),
+    expires_in: 3600
+  });
+});
+
+// 4. Info (من الكود)
+app.get('/info', (req, res) => {
+  console.log('📊 Info requested');
+  const id = req.query.Id || 'unknown';
+  res.json({
+    ProfileInfo: {
+      Name: "STRAVEX_VIP",
+      Level: 100,
+      ID: id
+    }
+  });
+});
+
+// 5. Ping (اختبار الاتصال)
+app.get('/Ping', (req, res) => {
+  console.log('🏓 Ping requested');
+  res.json({ status: "success", pong: true });
+});
+
+// 6. نقطة عامة (Catch-All)
 app.all('*', (req, res) => {
   console.log(`⚠️ Unhandled: ${req.method} ${req.path}`);
   res.json({
@@ -161,4 +117,7 @@ app.all('*', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Server running on port ${PORT}`);
   console.log(`🌐 URL: https://stravex-vip-proxy.onrender.com`);
+  console.log(`📦 Items loaded: ${ITEMS_DB.length}`);
+  console.log(`💎 Diamonds: 99,999,999`);
+  console.log(`🪙 Gold: 99,999,999`);
 });
