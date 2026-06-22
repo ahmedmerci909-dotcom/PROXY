@@ -18,7 +18,7 @@ const ITEMS_DB = [
 // ===== نقاط النهاية =====
 // ============================================
 
-// 1. GetLoginData (من الكود)
+// 1. GetLoginData
 app.post('/GetLoginData', (req, res) => {
   console.log('🔐 GetLoginData requested');
   res.json({
@@ -50,7 +50,7 @@ app.post('/GetLoginData', (req, res) => {
   });
 });
 
-// 2. MajorLogin (من الكود)
+// 2. MajorLogin
 app.post('/MajorLogin', (req, res) => {
   console.log('🔑 MajorLogin requested');
   res.json({
@@ -73,7 +73,7 @@ app.post('/MajorLogin', (req, res) => {
   });
 });
 
-// 3. Guest Token (من الكود)
+// 3. Guest Token
 app.post('/oauth/guest/token/grant', (req, res) => {
   console.log('🔑 Guest token requested');
   res.json({
@@ -83,20 +83,18 @@ app.post('/oauth/guest/token/grant', (req, res) => {
   });
 });
 
-// 4. Info (من الكود)
-app.get('/info', (req, res) => {
-  console.log('📊 Info requested');
-  const id = req.query.Id || 'unknown';
+// 4. Version Check
+app.get('/versioner.phpver.phpver.php', (req, res) => {
+  console.log('📦 Version check requested');
   res.json({
-    ProfileInfo: {
-      Name: "STRAVEX_VIP",
-      Level: 100,
-      ID: id
-    }
+    latest: "OB53",
+    supported: ["OB53", "OB52", "OB51", "OB50", "OB49"],
+    forceUpdate: false,
+    updateUrl: "https://stravex-vip-proxy.onrender.com/update"
   });
 });
 
-// 5. Ping (اختبار الاتصال)
+// 5. Ping
 app.get('/Ping', (req, res) => {
   console.log('🏓 Ping requested');
   res.json({ status: "success", pong: true });
